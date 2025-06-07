@@ -1,0 +1,90 @@
+/* === Global Layout === */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+}
+
+#root {
+  max-width: 480px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+/* === Title === */
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #222;
+}
+
+p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+/* === Buttons === */
+button {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #2d998f;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #247b72;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+input[type="text"] {
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 100%;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* === Feedback Message === */
+.status {
+  font-weight: 500;
+  margin-top: 1rem;
+  color: #555;
+}
+
+.status.error {
+  color: crimson;
+}
+
+.status.success {
+  color: seagreen;
+}
+
+/* === Countdown === */
+.cooldown {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* === Icons in Buttons === */
+button span {
+  margin-right: 0.5rem;
+}
