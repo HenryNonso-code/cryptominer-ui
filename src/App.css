@@ -4,6 +4,12 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #f9f9f9;
   color: #333;
+  transition: background 0.3s, color 0.3s;
+}
+
+body.dark {
+  background: #1e1e1e;
+  color: #eaeaea;
 }
 
 #root {
@@ -12,8 +18,14 @@ body {
   padding: 2rem;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   text-align: center;
+  transition: background 0.3s, color 0.3s;
+}
+
+body.dark #root {
+  background: #2a2a2a;
+  color: #eaeaea;
 }
 
 /* === Title === */
@@ -21,6 +33,10 @@ h1 {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
   color: #222;
+}
+
+body.dark h1 {
+  color: #f1f1f1;
 }
 
 p {
@@ -51,6 +67,12 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* === Icons in Buttons === */
+button span {
+  margin-right: 0.5rem;
+}
+
+/* === Input Field === */
 input[type="text"] {
   padding: 0.5rem;
   font-size: 1rem;
@@ -59,6 +81,7 @@ input[type="text"] {
   margin-bottom: 0.5rem;
   border-radius: 6px;
   border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
 /* === Feedback Message === */
@@ -84,7 +107,13 @@ input[type="text"] {
   margin-bottom: 1rem;
 }
 
-/* === Icons in Buttons === */
-button span {
-  margin-right: 0.5rem;
+/* === Leaderboard Link === */
+a button {
+  margin-top: 1rem;
+  background-color: #facc15;
+  color: black;
+}
+
+a button:hover {
+  background-color: #eab308;
 }

@@ -1,138 +1,86 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 
-const API_URL = 'https://cryptominerbot-1.onrender.com';
+const API_URL = 'https://crypto-miner-bot-web.onrender.com'; // ✅ Your deployed backend
 
 function App() {
   const [telegramId, setTelegramId] = useState(null);
   const [balance, setBalance] = useState(null);
   const [message, setMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
-  const [lastMined, setLastMined] = useState(null);
-  const [cooldownRemaining, setCooldownRemaining] = useState(0);
 
-  // ✅ Load Telegram context
+  // ✅ Get Telegram ID from Telegram WebApp
   useEffect(() => {
-    try {
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.ready();
-        const user = window.Telegram.WebApp.initDataUnsafe?.user;
-        if (user?.id) {
-          const id = user.id.toString();
-          setTelegramId(id);
-          console.log("✅ Telegram ID loaded:", id);
-        } else {
-          console.warn("⚠️ No Telegram user in context.");
-        }
-      } else {
-        console.warn("❌ Telegram WebApp object not available.");
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.ready();
+      const user = window.Telegram.WebApp.initDataUnsafe?.user;
+      if (user?.id) {
+        setTelegramId(user.id.toString());
       }
-    } catch (err) {
-      console.error("Telegram init error:", err);
     }
   }, []);
 
-  // === API Actions ===
+  // ✅ Handle mining, spinning, quest, etc.
   const handleAction = async (endpoint) => {
-    if (!telegramId) return setMessage('⚠️ Telegram ID not loaded');
+    if (!telegramId) return setMessage('⚠️ Telegram ID not found');
     try {
-      const res = await fetch(`${API_URL}/${endpoint}?telegram_id=${telegramId}`, {
+      const res = await fetch(`${API_URL}/${endpoint}`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ telegram_id: telegramId })
       });
       const data = await res.json();
-      setMessage(data.message || '✅ Success');
+      setMessage(data.message || '✅ Done');
       if (data.balance !== undefined) setBalance(data.balance);
-      if (data.last_mined) setLastMined(new Date(data.last_mined));
     } catch (err) {
       console.error(err);
-      setMessage('❌ Failed to perform action');
+      setMessage('❌ Failed to connect');
     }
   };
 
-  const handleBalance = async () => {
-    if (!telegramId) return setMessage('⚠️ Telegram ID not loaded');
-    try {
-      const res = await fetch(`${API_URL}/balance?telegram_id=${telegramId}`);
-      const data = await res.json();
-      setBalance(data.balance);
-      if (data.last_mined) setLastMined(new Date(data.last_mined));
-    } catch (err) {
-      setMessage('⚠️ Could not fetch balance');
-    }
-  };
-
+  // ✅ Link wallet to user account
   const handleLinkWallet = async () => {
-    if (!telegramId) return setMessage('⚠️ Telegram ID not loaded');
+    if (!telegramId || !walletAddress) return;
     try {
       const res = await fetch(`${API_URL}/link-wallet`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ telegram_id: telegramId, wallet_address: walletAddress }),
+        body: JSON.stringify({ telegram_id: telegramId, wallet_address: walletAddress })
       });
       const data = await res.json();
-      setMessage(data.message || '✅ Wallet linked');
+      setMessage(data.message || '✅ Wallet Linked');
     } catch (err) {
-      setMessage('❌ Failed to link wallet');
+      setMessage('❌ Link failed');
     }
   };
-
-  // Cooldown logic
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (lastMined) {
-        const now = new Date();
-        const diff = (now - lastMined) / 1000;
-        const cooldown = 300;
-        setCooldownRemaining(Math.max(0, cooldown - diff));
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [lastMined]);
 
   return (
     <div className="App">
       <h1>JOHEC</h1>
+      <p>🆔 Telegram ID: {telegramId || 'Detecting...'}</p>
 
-      {/* ✅ Debugging only – can be removed later */}
-      <p>🆔 Telegram ID: {telegramId || 'unknown'}</p>
+      <button onClick={() => handleAction('register')}>📝 Register</button>
+      <button onClick={() => handleAction('mine')}>⛏️ Mine</button>
+      <button onClick={() => handleAction('spin')}>🎰 Spin</button>
+      <button onClick={() => handleAction('quest')}>🎯 Quest</button>
+      <button onClick={() => handleAction('balance')}>💰 Check Balance</button>
 
-      <button onClick={() => handleAction('register')}>
-        <span>📝</span> Register
-      </button>
+      <input
+        type="text"
+        placeholder="Enter wallet address"
+        value={walletAddress}
+        onChange={(e) => setWalletAddress(e.target.value)}
+      />
+      <button onClick={handleLinkWallet}>🔗 Link Wallet</button>
 
-      <button onClick={() => handleAction('mine')} disabled={cooldownRemaining > 0}>
-        <span>⛏️</span> Mine
-      </button>
-      {cooldownRemaining > 0 && (
-        <p className="cooldown">⏳ Wait {Math.ceil(cooldownRemaining)}s</p>
-      )}
+      {message && <p>{message}</p>}
+      {balance !== null && <p>Wallet Balance: {balance} coins</p>}
 
-      <button onClick={() => handleAction('spin')}>
-        <span>🎰</span> Spin
-      </button>
-
-      <button onClick={() => handleAction('quest')}>
-        <span>🎯</span> Quest
-      </button>
-
-      <button onClick={handleBalance}>
-        <span>💰</span> Check Balance
-      </button>
-
-      <div>
-        <input
-          type="text"
-          placeholder="Enter wallet address"
-          value={walletAddress}
-          onChange={(e) => setWalletAddress(e.target.value)}
-        />
-        <button onClick={handleLinkWallet}>
-          <span>🔗</span> Link Wallet
+      <a href="/leaderboard">
+        <button style={{ backgroundColor: '#facc15', color: 'black' }}>
+          🏆 View Leaderboard
         </button>
-      </div>
-
-      {message && <p className="status">{message}</p>}
-      {balance !== null && <p className="status success">Wallet Balance: {balance} coins</p>}
+      </a>
     </div>
   );
 }
